@@ -1,49 +1,49 @@
 <?php
-// Personeel overzicht tonen (presentatie) met autorisatie via verwerklaag
+// Personeel overzicht tonen (presentatie) - toegang via verwerklaag afgedwongen
 
 session_start();
 
-// Verwerklaag aanroepen (afdwingt role personeel + zet $actieveBestellingen klaar)
+$pageTitle = 'Bestellingen (Personeel) - Pizzeria Sole Machina';
+
+// Verwerklaag: autorisatie afdwingen + (later) data klaarzetten
 require_once __DIR__ . '/../verwerk/personeel_overzicht_verwerk.php';
 
-$pageTitle = 'Personeel - Actieve bestellingen';
-
+// Layout
 require_once __DIR__ . '/../herbruikbaar/header.php';
-require_once __DIR__ . '/../herbruikbaar/navbar.php';
 ?>
-<main>
-    <section>
-        <h1>Actieve bestellingen</h1>
 
-        <?php if (empty($actieveBestellingen)): ?>
-            <p>Er zijn momenteel geen actieve bestellingen (of de koppeling met de database komt in Hoofdstap 9).</p>
-        <?php else: ?>
-            <table>
-                <thead>
+<section>
+    <h1>Actieve bestellingen</h1>
+
+    <?php if (empty($actieveBestellingen)): ?>
+        <p>Er zijn momenteel geen actieve bestellingen (koppeling met database volgt bij personeel-orders).</p>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ordernummer</th>
+                    <th>Klant</th>
+                    <th>Status</th>
+                    <th>Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($actieveBestellingen as $order): ?>
                     <tr>
-                        <th>Ordernummer</th>
-                        <th>Klant</th>
-                        <th>Status</th>
-                        <th>Acties</th>
+                        <td><?= htmlspecialchars((string)($order['order_id'] ?? '')) ?></td>
+                        <td><?= htmlspecialchars((string)($order['username'] ?? '')) ?></td>
+                        <td><?= htmlspecialchars((string)($order['status'] ?? '')) ?></td>
+                        <td>
+                            <a href="/view/bestelling_detail.php?order_id=<?= urlencode((string)($order['order_id'] ?? '')) ?>">
+                                Details
+                            </a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($actieveBestellingen as $order): ?>
-                        <tr>
-                            <td><?= htmlspecialchars((string)($order['order_id'] ?? '')) ?></td>
-                            <td><?= htmlspecialchars((string)($order['username'] ?? '')) ?></td>
-                            <td><?= htmlspecialchars((string)($order['status'] ?? '')) ?></td>
-                            <td>
-                                <a href="/applicatie/view/bestelling_detail.php?order_id=<?= urlencode((string)($order['order_id'] ?? '')) ?>">
-                                    Details
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-    </section>
-</main>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</section>
+
 <?php
 require_once __DIR__ . '/../herbruikbaar/footer.php';

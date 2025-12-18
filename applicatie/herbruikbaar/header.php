@@ -1,10 +1,13 @@
 <?php
-// Basis HTML-header genereren voor alle presentatiepagina's (head + site header + navbar)
+// Basis HTML-header genereren voor alle presentatiepagina's (head + site header + main openen)
 // Verwacht vanuit de view: $pageTitle (string)
 
 if (!isset($pageTitle) || $pageTitle === '') {
     $pageTitle = 'Pizzeria Sole Machina';
 }
+
+// Alleen sessiewaarden lezen (sessie wordt gestart in de view)
+$ingelogdeGebruiker = $_SESSION['username'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -26,12 +29,17 @@ if (!isset($pageTitle) || $pageTitle === '') {
 <body>
 
 <header>
-    <h1>Pizzeria Sole Machina</h1>
-    <p>Welkom! Bekijk het menu en plaats eenvoudig je bestelling.</p>
+    <div>
+        <h1>Pizzeria Sole Machina</h1>
+
+        <?php if ($ingelogdeGebruiker): ?>
+            <p>Ingelogd als: <?= htmlspecialchars($ingelogdeGebruiker) ?></p>
+        <?php endif; ?>
+    </div>
 </header>
 
 <?php
-// Navigatie genereren (presentatie). View start de sessie, navbar leest alleen sessie-waarden.
+// Navigatie genereren (presentatie)
 require_once __DIR__ . '/navbar.php';
 ?>
 

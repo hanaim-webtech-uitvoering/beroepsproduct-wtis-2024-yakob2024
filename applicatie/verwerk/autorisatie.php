@@ -3,7 +3,7 @@
 
 // Directe toegang via URL blokkeren (dit bestand is bedoeld om te includen)
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
-    header('Location: ../view/index.php');
+    header('Location: /view/index.php');
     exit;
 }
 
@@ -12,7 +12,6 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
  */
 function ensureSessionStarted(): void
 {
-    // Sessie starten als dat nog niet gebeurd is
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
@@ -37,9 +36,23 @@ function currentRole(): ?string
 }
 
 /**
+ * Rollen volgens database (consistent)
+ */
+function isPersonnelRole(?string $role): bool
+{
+    return $role === 'Personnel';
+}
+
+function isCustomerRole(?string $role): bool
+{
+    // In jouw dataset komen zowel Customer als Client voor
+    return $role === 'Customer' || $role === 'Client';
+}
+
+/**
  * Login verplicht stellen (anders redirect)
  */
-function requireLogin(string $redirectTo = '/applicatie/view/login.php'): void
+function requireLogin(string $redirectTo = '/view/login.php'): void
 {
     if (!isLoggedIn()) {
         header('Location: ' . $redirectTo);
@@ -50,7 +63,7 @@ function requireLogin(string $redirectTo = '/applicatie/view/login.php'): void
 /**
  * Specifieke rol verplicht stellen (anders redirect)
  */
-function requireRole(string $role, string $redirectTo = '/applicatie/view/index.php'): void
+function requireRole(string $role, string $redirectTo = '/view/index.php'): void
 {
     requireLogin();
 
@@ -64,12 +77,38 @@ function requireRole(string $role, string $redirectTo = '/applicatie/view/index.
 /**
  * Een van meerdere rollen toestaan (anders redirect)
  */
-function requireAnyRole(array $roles, string $redirectTo = '/applicatie/view/index.php'): void
+function requireAnyRole(array $roles, string $redirectTo = '/view/index.php'): void
 {
     requireLogin();
 
     $current = currentRole();
     if ($current === null || !in_array($current, $roles, true)) {
+        header('Location: ' . $redirectTo);
+        exit;
+    }
+}
+
+/**
+ * Personeel verplicht stellen (Personnel)
+ */
+function requirePersonnel(string $redirectTo = '/view/index.php'): void
+{
+    requireLogin();
+
+    if (!isPersonnelRole(currentRole())) {
+        header('Location: ' . $redirectTo);
+        exit;
+    }
+}
+
+/**
+ * Klant verplicht stellen (Customer of Client)
+ */
+function requireCustomer(string $redirectTo = '/view/index.php'): void
+{
+    requireLogin();
+
+    if (!isCustomerRole(currentRole())) {
         header('Location: ' . $redirectTo);
         exit;
     }
