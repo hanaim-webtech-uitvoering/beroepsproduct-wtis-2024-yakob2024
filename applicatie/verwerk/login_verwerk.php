@@ -1,9 +1,12 @@
 <?php
 // Login verwerken (validatie, gebruiker ophalen, wachtwoord checken, sessie starten, redirect)
+// Sessiehygiëne: centrale sessie-helper gebruiken + sessie-id regenereren
 
-session_start();
-
+require_once __DIR__ . '/sessie.php';
 require_once __DIR__ . '/../data/user_data.php';
+
+// Veilige sessiestart
+startSecureSession();
 
 // Alleen POST verzoeken toestaan
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -44,7 +47,7 @@ if ($user === null) {
     exit;
 }
 
-// Wachtwoord controleren (hash in database verwacht)
+// Wachtwoord controleren
 $hash = (string)($user['password'] ?? '');
 
 if ($hash === '' || !password_verify($password, $hash)) {
@@ -55,12 +58,11 @@ if ($hash === '' || !password_verify($password, $hash)) {
 }
 
 // Sessiebeveiliging: nieuw sessie-id na login
-session_regenerate_id(true);
+regenerateSessionId();
 
-// Rol uit database halen (geen oude 'klant' fallback)
+// Rol uit database halen
 $role = $user['role'] ?? null;
 if ($role === null || $role === '') {
-    // Als de database geen rol teruggeeft, behandelen we dit als fout (consistent en veilig)
     $_SESSION['login_errors'] = ['Account heeft geen geldige rol. Neem contact op met beheer.'];
     $_SESSION['login_old'] = ['username' => $username];
     header('Location: /view/login.php');
@@ -74,12 +76,11 @@ $_SESSION['role'] = $role;
 // Oude meldingen opruimen
 unset($_SESSION['login_errors'], $_SESSION['login_old']);
 
-// Redirect op rol (consistent met jouw data: Personnel)
+// Redirect op rol
 if ($role === 'Personnel') {
     header('Location: /view/overzichtpersoneel.php');
     exit;
 }
 
-// Alle andere rollen behandelen we als klant (Customer/Client etc.)
-header('Location: /view/menu.php');
+header('Location: /view/index.php');
 exit;
