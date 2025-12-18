@@ -1,0 +1,137 @@
+/* Basis styling voor Pizzeria Sole Machina */
+/* Doel: overzicht, structuur, vaste header/navbar/footer */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Layout basis */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000;
+    background-color: #f5f5f5;
+
+    /* Ruimte reserveren voor vaste header + navbar */
+    padding-top: 170px;
+
+    /* Ruimte reserveren voor vaste footer */
+    padding-bottom: 80px;
+}
+
+/* Header (vast bovenin) */
+header {
+    /* Donkerrood */
+    background-color: #7b1e1e;
+    color: #ffffff;
+
+    padding: 20px;
+
+    /* Lock header bovenin */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    /* Hoogte vast zodat navbar er strak onder past */
+    height: 110px;
+
+    z-index: 1000;
+}
+
+/* Hoofdtitel in header */
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+/* Subtekst in header */
+header p {
+    font-size: 1rem;
+}
+
+/* Navbar (vast onder header) */
+nav {
+    background-color: #8f2a2a;
+
+    padding: 10px 20px;
+
+    position: fixed;
+    top: 110px; /* sluit aan op header hoogte */
+    left: 0;
+    width: 100%;
+
+    z-index: 999;
+}
+
+/* Navbar lijst */
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+/* Navbar links */
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+/* Hover effect navbar */
+nav ul li a:hover {
+    background-color: #ffffff;
+    color: #7b1e1e;
+}
+
+/* Hoofdinhoud */
+main {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+/* Secties */
+section {
+    margin-bottom: 30px;
+}
+
+/* Subkoppen */
+h2 {
+    margin-bottom: 10px;
+    color: #7b1e1e;
+}
+
+/* Links in content */
+main a {
+    color: #7b1e1e;
+    text-decoration: none;
+}
+
+main a:hover {
+    text-decoration: underline;
+}
+
+/* Footer (vast onderin) */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    background-color: #7b1e1e;
+    color: #ffffff;
+
+    text-align: center;
+    padding: 15px;
+}
+
+/* Footer links */
+footer a {
+    color: #ffffff;
+    text-decoration: underline;
+}
