@@ -9,8 +9,9 @@ startSecureSession();
 requirePersonnel('/view/login.php');
 
 // Output voor view
-$orders = [];
-$statusLabels = [];  // [order_id => label]
+$orders = [];             // actief
+$completedOrders = [];    // afgerond
+$statusLabels = [];       // [order_id => label]
 $fout = null;
 
 /**
@@ -36,8 +37,13 @@ function personeelStatusLabel(?int $status): string
 }
 
 try {
+    // Actief (1/2)
     $orders = personeelGetActiveOrders();
 
+    // Afgerond (3)
+    $completedOrders = personeelGetCompletedOrders();
+
+    // Labels voor beide lijsten
     foreach ($orders as $o) {
         $oid = (int)($o['order_id'] ?? 0);
         if ($oid <= 0) {
@@ -45,8 +51,18 @@ try {
         }
         $statusLabels[$oid] = personeelStatusLabel(isset($o['status']) ? (int)$o['status'] : null);
     }
+
+    foreach ($completedOrders as $o) {
+        $oid = (int)($o['order_id'] ?? 0);
+        if ($oid <= 0) {
+            continue;
+        }
+        $statusLabels[$oid] = personeelStatusLabel(isset($o['status']) ? (int)$o['status'] : null);
+    }
+
 } catch (Throwable $e) {
     $orders = [];
+    $completedOrders = [];
     $statusLabels = [];
-    $fout = 'Actieve bestellingen konden niet worden geladen.';
+    $fout = 'Bestellingen konden niet worden geladen.';
 }

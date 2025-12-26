@@ -34,6 +34,34 @@ function personeelGetActiveOrders(): array
 }
 
 /**
+ * Afgeronde bestellingen ophalen (status = 3).
+ */
+function personeelGetCompletedOrders(): array
+{
+    // Afgeronde bestellingen ophalen uit database
+    $db = maakVerbinding();
+
+    $sql = "
+        SELECT
+            order_id,
+            client_username,
+            client_name,
+            personnel_username,
+            [datetime],
+            status,
+            address
+        FROM dbo.Pizza_Order
+        WHERE status = 3
+        ORDER BY [datetime] DESC, order_id DESC
+    ";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
+/**
  * Eén bestelling ophalen (header) op order_id.
  */
 function personeelGetOrder(int $orderId): ?array

@@ -1,9 +1,9 @@
 <?php
 // Personeeloverzicht tonen (presentatie) met herbruikbare header/footer
 
-$pageTitle = 'Actieve bestellingen - Personeel';
+$pageTitle = 'Bestellingen - Personeel';
 
-// Verwerklaag: actieve orders ophalen
+// Verwerklaag: actieve + afgeronde orders ophalen
 require_once __DIR__ . '/../verwerk/overzichtpersoneel_verwerk.php';
 
 // Layout
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../herbruikbaar/header.php';
 ?>
 
 <section>
-    <h1>Actieve bestellingen</h1>
+    <h1>Bestellingen (personeel)</h1>
 
     <?php if (!empty($fout)): ?>
         <div>
@@ -19,43 +19,88 @@ require_once __DIR__ . '/../herbruikbaar/header.php';
             <p><?= htmlspecialchars($fout) ?></p>
         </div>
 
-    <?php elseif (empty($orders)): ?>
-        <p>Er zijn momenteel geen actieve bestellingen.</p>
-
     <?php else: ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>Order #</th>
-                    <th>Datum/tijd</th>
-                    <th>Klant</th>
-                    <th>Adres</th>
-                    <th>Status</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($orders as $o): ?>
-                    <?php
-                        $oid = (int)($o['order_id'] ?? 0);
-                        $dt = (string)($o['datetime'] ?? '');
-                        $clientName = (string)($o['client_name'] ?? '');
-                        $addr = (string)($o['address'] ?? '');
-                        $statusTxt = $statusLabels[$oid] ?? 'Onbekend';
-                    ?>
+
+        <h2>Actieve bestellingen</h2>
+
+        <?php if (empty($orders)): ?>
+            <p>Er zijn momenteel geen actieve bestellingen.</p>
+        <?php else: ?>
+            <table>
+                <thead>
                     <tr>
-                        <td><?= $oid ?></td>
-                        <td><?= htmlspecialchars($dt) ?></td>
-                        <td><?= htmlspecialchars($clientName) ?></td>
-                        <td><?= htmlspecialchars($addr) ?></td>
-                        <td><?= htmlspecialchars($statusTxt) ?></td>
-                        <td>
-                            <a href="/view/personeel_bestelling_detail.php?order_id=<?= $oid ?>">Bekijk</a>
-                        </td>
+                        <th>Order #</th>
+                        <th>Datum/tijd</th>
+                        <th>Klant</th>
+                        <th>Adres</th>
+                        <th>Status</th>
+                        <th>Details</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $o): ?>
+                        <?php
+                            $oid = (int)($o['order_id'] ?? 0);
+                            $dt = (string)($o['datetime'] ?? '');
+                            $clientName = (string)($o['client_name'] ?? '');
+                            $addr = (string)($o['address'] ?? '');
+                            $statusTxt = $statusLabels[$oid] ?? 'Onbekend';
+                        ?>
+                        <tr>
+                            <td><?= $oid ?></td>
+                            <td><?= htmlspecialchars($dt) ?></td>
+                            <td><?= htmlspecialchars($clientName) ?></td>
+                            <td><?= htmlspecialchars($addr) ?></td>
+                            <td><?= htmlspecialchars($statusTxt) ?></td>
+                            <td>
+                                <a href="/view/personeel_bestelling_detail.php?order_id=<?= $oid ?>">Bekijk</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <h2>Afgeronde bestellingen</h2>
+
+        <?php if (empty($completedOrders)): ?>
+            <p>Er zijn nog geen afgeronde bestellingen.</p>
+        <?php else: ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Datum/tijd</th>
+                        <th>Klant</th>
+                        <th>Adres</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($completedOrders as $o): ?>
+                        <?php
+                            $oid = (int)($o['order_id'] ?? 0);
+                            $dt = (string)($o['datetime'] ?? '');
+                            $clientName = (string)($o['client_name'] ?? '');
+                            $addr = (string)($o['address'] ?? '');
+                            $statusTxt = $statusLabels[$oid] ?? 'Onbekend';
+                        ?>
+                        <tr>
+                            <td><?= $oid ?></td>
+                            <td><?= htmlspecialchars($dt) ?></td>
+                            <td><?= htmlspecialchars($clientName) ?></td>
+                            <td><?= htmlspecialchars($addr) ?></td>
+                            <td><?= htmlspecialchars($statusTxt) ?></td>
+                            <td>
+                                <a href="/view/personeel_bestelling_detail.php?order_id=<?= $oid ?>">Bekijk</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
     <?php endif; ?>
 
     <p style="margin-top: 12px;">
