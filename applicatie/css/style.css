@@ -104,6 +104,72 @@ main a:hover {
     text-decoration: underline;
 }
 
+/* ========================= */
+/* Tabellen (overzichtelijk) */
+/* ========================= */
+
+/* Zorgt dat tabellen netjes binnen main vallen */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    margin-bottom: 12px;
+
+    /* kleine rounding via wrapper effect */
+    border: 1px solid #ddd;
+}
+
+/* Header row */
+thead th {
+    background-color: #7b1e1e;
+    color: #ffffff;
+    text-align: left;
+    padding: 10px;
+    font-weight: bold;
+}
+
+/* Cells */
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid #e3e3e3;
+    vertical-align: top;
+}
+
+/* Zebra stripes */
+tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Hover highlight */
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Kleine tabeltekst */
+table td {
+    font-size: 0.95rem;
+}
+
+/* ========================= */
+/* Form basics (handig)      */
+/* ========================= */
+input, select, button {
+    font: inherit;
+}
+
+button {
+    background-color: #7b1e1e;
+    color: #ffffff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #8f2a2a;
+}
+
 /* Footer (desktop vast) */
 footer {
     position: fixed;
@@ -171,6 +237,13 @@ footer a {
     main {
         margin: 10px;
         padding: 15px;
+    }
+
+    /* Tabellen: horizontaal scrollbaar op mobiel */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     footer {
