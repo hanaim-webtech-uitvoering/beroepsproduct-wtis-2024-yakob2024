@@ -1,114 +1,65 @@
 <?php
-// Autorisatie functies voor verwerklaag (login/rol afdwingen en onbevoegde toegang blokkeren)
+// Autorisatie helpers (verwerklaag): login/rol checks + redirects
 
-// Directe toegang via URL blokkeren (dit bestand is bedoeld om te includen)
-if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
-    header('Location: /view/index.php');
+function isLoggedIn(): bool
+{
+    return isset($_SESSION['username']) && (string)$_SESSION['username'] !== '';
+}
+
+function currentRole(): string
+{
+    return (string)($_SESSION['role'] ?? '');
+}
+
+function requireLogin(string $redirectIfNotLoggedIn = '/view/login.php'): void
+{
+    // Login verplichten
+    if (!isLoggedIn()) {
+        header('Location: ' . $redirectIfNotLoggedIn);
+        exit;
+    }
+}
+
+function denyAccess(string $message = 'Geen toegang.', string $redirectTo = '/view/index.php'): void
+{
+    // Geen toegang -> naar home (ingelogd blijft ingelogd)
+    $_SESSION['auth_flash'] = $message;
+    header('Location: ' . $redirectTo);
     exit;
 }
 
-/**
- * Sessie veilig beschikbaar maken (zonder dubbele session_start warnings)
- */
-function ensureSessionStarted(): void
+function requireCustomer(string $redirectIfNotLoggedIn = '/view/login.php'): void
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
+    // Klantrol verplichten
+    requireLogin($redirectIfNotLoggedIn);
+
+    $role = currentRole();
+    $isCustomer = in_array($role, ['Customer', 'Client', 'klant'], true);
+
+    if (!$isCustomer) {
+        denyAccess('Geen toegang: deze pagina is alleen voor klanten.', '/view/index.php');
+    }
+}
+
+function requirePersonnel(string $redirectIfNotLoggedIn = '/view/login.php'): void
+{
+    // Personeelrol verplichten
+    requireLogin($redirectIfNotLoggedIn);
+
+    $role = currentRole();
+    $isPersonnel = in_array($role, ['Personnel', 'personeel'], true);
+
+    if (!$isPersonnel) {
+        denyAccess('Geen toegang: deze pagina is alleen voor personeel.', '/view/index.php');
     }
 }
 
 /**
- * Controleren of gebruiker is ingelogd
+ * Voor login/registratie: als je al ingelogd bent, stuur door naar home.
  */
-function isLoggedIn(): bool
+function redirectIfLoggedIn(string $redirectTo = '/view/index.php'): void
 {
-    ensureSessionStarted();
-    return isset($_SESSION['username']) && $_SESSION['username'] !== '';
-}
-
-/**
- * Huidige rol ophalen uit sessie
- */
-function currentRole(): ?string
-{
-    ensureSessionStarted();
-    return $_SESSION['role'] ?? null;
-}
-
-/**
- * Rollen volgens database (consistent)
- */
-function isPersonnelRole(?string $role): bool
-{
-    return $role === 'Personnel';
-}
-
-function isCustomerRole(?string $role): bool
-{
-    // In jouw dataset komen Customer/Client voor én legacy testdata 'klant'
-    return $role === 'Customer' || $role === 'Client' || $role === 'klant';
-}
-
-/**
- * Login verplicht stellen (anders redirect)
- */
-function requireLogin(string $redirectTo = '/view/login.php'): void
-{
-    if (!isLoggedIn()) {
-        header('Location: ' . $redirectTo);
-        exit;
-    }
-}
-
-/**
- * Specifieke rol verplicht stellen (anders redirect)
- */
-function requireRole(string $role, string $redirectTo = '/view/index.php'): void
-{
-    requireLogin();
-
-    $current = currentRole();
-    if ($current !== $role) {
-        header('Location: ' . $redirectTo);
-        exit;
-    }
-}
-
-/**
- * Een van meerdere rollen toestaan (anders redirect)
- */
-function requireAnyRole(array $roles, string $redirectTo = '/view/index.php'): void
-{
-    requireLogin();
-
-    $current = currentRole();
-    if ($current === null || !in_array($current, $roles, true)) {
-        header('Location: ' . $redirectTo);
-        exit;
-    }
-}
-
-/**
- * Personeel verplicht stellen (Personnel)
- */
-function requirePersonnel(string $redirectTo = '/view/index.php'): void
-{
-    requireLogin();
-
-    if (!isPersonnelRole(currentRole())) {
-        header('Location: ' . $redirectTo);
-        exit;
-    }
-}
-
-/**
- * Klant verplicht stellen (Customer, Client of legacy: klant)
- */
-function requireCustomer(string $redirectTo = '/view/index.php'): void
-{
-    requireLogin();
-
-    if (!isCustomerRole(currentRole())) {
+    if (isLoggedIn()) {
         header('Location: ' . $redirectTo);
         exit;
     }

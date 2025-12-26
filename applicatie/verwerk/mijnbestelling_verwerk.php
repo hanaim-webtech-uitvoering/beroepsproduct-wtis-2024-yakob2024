@@ -4,6 +4,7 @@
 require_once __DIR__ . '/sessie.php';
 require_once __DIR__ . '/autorisatie.php';
 require_once __DIR__ . '/../data/bestellingen_data.php';
+require_once __DIR__ . '/../herbruikbaar/status.php';
 
 // Veilige sessie
 startSecureSession();
@@ -16,30 +17,6 @@ $orders = [];
 $orderTotals = [];     // [order_id => float]
 $statusLabels = [];    // [order_id => 'Tekst']
 $fout = null;
-
-/**
- * Status mapping (int -> tekst)
- * Deze mapping maken we expliciet zodat het assesbaar is.
- * Als jouw docent andere statuscodes verwacht, passen we dit later aan.
- */
-function mapStatusToLabel(?int $status): string
-{
-    // Order status label bepalen
-    if ($status === null) {
-        return 'Onbekend';
-    }
-
-    switch ($status) {
-        case 1:
-            return 'Nieuw';
-        case 2:
-            return 'In behandeling';
-        case 3:
-            return 'Afgerond';
-        default:
-            return 'Onbekend';
-    }
-}
 
 try {
     $username = (string)($_SESSION['username'] ?? '');
@@ -54,9 +31,11 @@ try {
                 continue;
             }
 
-            // totaal en statuslabel per order
+            // totaal per order
             $orderTotals[$oid] = bestellingenGetOrderTotal($oid);
-            $statusLabels[$oid] = mapStatusToLabel(isset($o['status']) ? (int)$o['status'] : null);
+
+            // status label via herbruikbaar
+            $statusLabels[$oid] = orderStatusLabel(isset($o['status']) ? (int)$o['status'] : null);
         }
     }
 } catch (Throwable $e) {

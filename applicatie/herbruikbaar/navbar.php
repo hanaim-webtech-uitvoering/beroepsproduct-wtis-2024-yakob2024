@@ -14,7 +14,6 @@ $isPersonnel = ($rol === 'Personnel');
         <!-- Publiek -->
         <li><a href="/view/index.php">Home</a></li>
         <li><a href="/view/menu.php">Menu</a></li>
-        <li><a href="/view/privacy.php">Privacy</a></li>
 
         <?php if (!$ingelogd): ?>
             <!-- Niet ingelogd -->

@@ -4,6 +4,7 @@
 require_once __DIR__ . '/sessie.php';
 require_once __DIR__ . '/autorisatie.php';
 require_once __DIR__ . '/../data/bestelling_detail_data.php';
+require_once __DIR__ . '/../herbruikbaar/status.php';
 
 startSecureSession();
 requireCustomer('/view/login.php');
@@ -14,28 +15,6 @@ $lines = [];
 $total = 0.0;
 $statusLabel = 'Onbekend';
 $fout = null;
-
-/**
- * Status mapping (int -> tekst)
- */
-function bestellingStatusLabel(?int $status): string
-{
-    // Status label bepalen
-    if ($status === null) {
-        return 'Onbekend';
-    }
-
-    switch ($status) {
-        case 1:
-            return 'Nieuw';
-        case 2:
-            return 'In behandeling';
-        case 3:
-            return 'Afgerond';
-        default:
-            return 'Onbekend';
-    }
-}
 
 try {
     $username = (string)($_SESSION['username'] ?? '');
@@ -67,7 +46,8 @@ try {
     $lines = bestellingDetailGetLinesWithPrice($orderId);
     $total = bestellingDetailGetTotal($orderId);
 
-    $statusLabel = bestellingStatusLabel(isset($order['status']) ? (int)$order['status'] : null);
+    // status label via herbruikbaar
+    $statusLabel = orderStatusLabel(isset($order['status']) ? (int)$order['status'] : null);
 
 } catch (Throwable $e) {
     $order = null;

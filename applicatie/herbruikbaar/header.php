@@ -1,13 +1,26 @@
 <?php
-// Basis HTML-header genereren voor alle presentatiepagina's (head + site header + main openen)
-// Verwacht vanuit de view: $pageTitle (string)
+// Basis HTML-header + globale layout (presentatie)
+// - opent <html>, <body> en <main>
+// - toont ingelogde gebruiker
+// - toont eenmalige autorisatie-meldingen (auth_flash)
 
+// Verwacht vanuit de view: $pageTitle (string)
 if (!isset($pageTitle) || $pageTitle === '') {
     $pageTitle = 'Pizzeria Sole Machina';
 }
 
-// Alleen sessiewaarden lezen (sessie wordt gestart in de view)
-$ingelogdeGebruiker = $_SESSION['username'] ?? null;
+// Ingelogde gebruiker (alleen tonen, geen logica)
+$ingelogdeGebruiker = '';
+if (isset($_SESSION['username']) && (string)$_SESSION['username'] !== '') {
+    $ingelogdeGebruiker = (string)$_SESSION['username'];
+}
+
+// Flash melding bij autorisatie (1x tonen)
+$authFlash = null;
+if (isset($_SESSION['auth_flash']) && (string)$_SESSION['auth_flash'] !== '') {
+    $authFlash = (string)$_SESSION['auth_flash'];
+    unset($_SESSION['auth_flash']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -23,24 +36,28 @@ $ingelogdeGebruiker = $_SESSION['username'] ?? null;
     <!-- Dynamische paginatitel -->
     <title><?= htmlspecialchars($pageTitle) ?></title>
 
-    <!-- Centrale stylesheet (relatief vanaf /view naar /css) -->
+    <!-- Centrale stylesheet (relatief t.o.v. /view/*) -->
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
 <header>
-    <div>
-        <h1>Pizzeria Sole Machina</h1>
+    <h1>Pizzeria Sole Machina</h1>
 
-        <?php if ($ingelogdeGebruiker): ?>
-            <p>Ingelogd als: <?= htmlspecialchars($ingelogdeGebruiker) ?></p>
-        <?php endif; ?>
-    </div>
+    <?php if ($ingelogdeGebruiker !== ''): ?>
+        <p>Ingelogd als: <?= htmlspecialchars($ingelogdeGebruiker) ?></p>
+    <?php endif; ?>
 </header>
 
 <?php
-// Navigatie genereren (presentatie)
+// Globale navigatie (rol-afhankelijk)
 require_once __DIR__ . '/navbar.php';
 ?>
 
 <main>
+
+<?php if ($authFlash !== null): ?>
+    <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc;">
+        <?= htmlspecialchars($authFlash) ?>
+    </div>
+<?php endif; ?>

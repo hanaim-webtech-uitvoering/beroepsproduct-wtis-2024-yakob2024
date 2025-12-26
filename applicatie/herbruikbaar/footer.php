@@ -5,7 +5,7 @@
 ?>
 <footer>
     <p>&copy; <?= date('Y') ?> Pizzeria Sole Machina</p>
-    <p><a href="/applicatie/view/privacy.php">Privacy</a></p>
+    <p><a href="../view/privacy.php">Privacy</a></p>
 </footer>
 
 </body>
