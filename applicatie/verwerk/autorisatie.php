@@ -45,8 +45,8 @@ function isPersonnelRole(?string $role): bool
 
 function isCustomerRole(?string $role): bool
 {
-    // In jouw dataset komen zowel Customer als Client voor
-    return $role === 'Customer' || $role === 'Client';
+    // In jouw dataset komen Customer/Client voor én legacy testdata 'klant'
+    return $role === 'Customer' || $role === 'Client' || $role === 'klant';
 }
 
 /**
@@ -102,7 +102,7 @@ function requirePersonnel(string $redirectTo = '/view/index.php'): void
 }
 
 /**
- * Klant verplicht stellen (Customer of Client)
+ * Klant verplicht stellen (Customer, Client of legacy: klant)
  */
 function requireCustomer(string $redirectTo = '/view/index.php'): void
 {
